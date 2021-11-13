@@ -34,6 +34,7 @@ async function run() {
     // GET products to client from home page
     app.get("/home/products", async (req, res) => {
       const result = await productCollection.find({}).limit(6).toArray();
+      res.json(result);
     });
     // GET products to client from explore page
     app.get("/products", async (req, res) => {
@@ -88,8 +89,25 @@ async function run() {
       const email = req.query.email;
       const query = { email: email };
       const result = await cartCollection.deleteMany(query);
-      console.log(result);
       res.json(result);
+    });
+    // Check admin
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      let isAdmin = false;
+      if (user?.role === "admin") {
+        isAdmin = true;
+      }
+      res.json({ admin: isAdmin });
+    });
+    //GET my orders from DB
+    app.get("/orders/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const myOrders = await orderCollection.find(query).toArray();
+      res.json(myOrders);
     });
   } finally {
     // client.close();
