@@ -23,6 +23,7 @@ async function run() {
     const usersCollection = database.collection("users");
     const cartCollection = database.collection("cart");
     const orderCollection = database.collection("order");
+    const reviewCollection = database.collection("review");
 
     // Add products to DB
     app.post("/products", async (req, res) => {
@@ -108,6 +109,26 @@ async function run() {
       const query = { email: email };
       const myOrders = await orderCollection.find(query).toArray();
       res.json(myOrders);
+    });
+    // GET the selected product from DB (to Review)
+    app.get("/products/:name", async (req, res) => {
+      const name = req.params.name;
+      const query = { name: name };
+      const product = await productCollection.findOne(query);
+      res.json(product);
+    });
+    // POST review in DB
+    app.post("/review", async (req, res) => {
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.json(result);
+      console.log(result);
+    });
+    // GET review in Home page
+    app.get("/review", async (req, res) => {
+      const result = await reviewCollection.find().toArray();
+      res.json(result);
+      console.log(result);
     });
   } finally {
     // client.close();
